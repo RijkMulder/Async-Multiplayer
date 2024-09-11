@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; -unity-background-image-tint-color: rgba(0, 0, 0, 0); background-color: rgb(255, 255, 255);">
+        <ui:TextField picking-mode="Ignore" label="Fruit name" name="FruitName" />
+        <ui:TextField picking-mode="Ignore" label="Fruit color" name="FruitColor" password="false" />
+        <ui:TextField picking-mode="Ignore" label="Quantity" name="Quantity" password="false" />
+        <ui:Button text="Button" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Submit" style="width: 40%;" />
+    </ui:VisualElement>
+</ui:UXML>
