@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,8 +7,15 @@ using UnityEngine.Networking;
 
 public class LoginWindow : MonoBehaviour
 {
+    private PackageManager packageManager;
     private UIDocument uiDocument;
-    private string url = "http://127.0.0.1/edsa-webdev/Login.php";
+    private string url = "http://127.0.0.1/edsa-webdev/CheckLogin.php";
+
+    private void Start()
+    {
+        packageManager = PackageManager.Instance;
+    }
+
     private void OnEnable()
     {
         uiDocument = GetComponent<UIDocument>();
@@ -16,30 +24,27 @@ public class LoginWindow : MonoBehaviour
         TextField password = root.Q<TextField>("Password");
         Button submitButton = root.Q<Button>("Submit");
         Button newAccountButton = root.Q<Button>("MakeAccount");
+        Button forgotPasswordButton = root.Q<Button>("ForgotPassword");
         submitButton.RegisterCallback<ClickEvent>(evt =>
         {
-            StartCoroutine(LoginAccount(new LoginAccountRequest
+            StartCoroutine(packageManager.SendRequest(JsonUtility.ToJson(new LoginAccountRequest
             {
                 email = email.value,
                 password = password.value
-            }));
+            })));
         });
         newAccountButton.RegisterCallback<ClickEvent>(evt =>
         {
-            UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.registerWindowAsset);
+            UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[1].asset);
         });
-    }
-
-    private IEnumerator LoginAccount(LoginAccountRequest request) 
-    {
-        string newEntry = JsonUtility.ToJson(request, true);
-        List<IMultipartFormSection> form = new();
-        form.Add(new MultipartFormDataSection("newEntry", newEntry));
-        using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
-        {
-            yield return webRequest.SendWebRequest();
-            Debug.Log(webRequest.downloadHandler.text);
-        }
+        // forgotPasswordButton.RegisterCallback<ClickEvent>(evt =>
+        // {
+        //     StartCoroutine(LoginAccount(JsonUtility.ToJson(new LoginAccountRequest
+        //     {
+        //         email = email.value,
+        //         password = password.value
+        //     })));
+        // });
     }
 }
 
@@ -50,11 +55,9 @@ public class LoginAccountRequest
     public string email;
     public string password;
 }
-
 [System.Serializable]
-public class LoginAccountResponse
+public class ResetPasswordRequest
 {
-    public string status;
-    public string customMessage;
-    public string token;
-}
+    public string action = "resetPassword";
+    public string email;
+} 

@@ -1,36 +1,69 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using System;
+
+[System.Serializable]
+public struct Asset
+{
+    public VisualTreeAsset asset;
+    public MonoScript script;
+}
 
 public class UIPanelManager : MonoBehaviour
 {
     public static UIPanelManager Instance { get; private set; }
+    public Asset[] assets;
     [SerializeField] private UIDocument uiDocument;
-    public VisualTreeAsset loginWindowAsset;
-    public VisualTreeAsset registerWindowAsset;
-    
-    [SerializeField] private LoginWindow loginWindow;
-    [SerializeField] private CreateAccountWindow createAccountWindow;
+    [SerializeField] private Dictionary<VisualTreeAsset, MonoScript> assetsDic = new();
     private void Awake()
     {
         Instance = this;
         uiDocument = GetComponent<UIDocument>();
+        CreateAssetsDic();
     }
 
     public void ChangeSourceAsset(VisualTreeAsset newAsset)
     {
         uiDocument.visualTreeAsset = newAsset;
-        if (newAsset == loginWindowAsset)
+        foreach (KeyValuePair<VisualTreeAsset, MonoScript> asset in assetsDic)
         {
-            loginWindow.enabled = true;
-            createAccountWindow.enabled = false;
+            // set everything false that isnt new asset
+            Type componentType = asset.Value.GetClass();
+            Component assetScript = GetComponent(componentType);
+            if (asset.Key != newAsset && assetScript is MonoBehaviour monoBehaviour)
+            {
+                monoBehaviour.enabled = false;
+            }
+            
+            // set correct asset true
+            else if (assetScript is MonoBehaviour monoBehaviour2)
+            {
+                monoBehaviour2.enabled = true;
+            }
         }
-        else
+    }
+
+    public void IsLoggedIn()
+    {
+        uiDocument.visualTreeAsset = null;
+        foreach (KeyValuePair<VisualTreeAsset, MonoScript> asset in assetsDic)
         {
-            loginWindow.enabled = false;
-            createAccountWindow.enabled = true;
+            Type componentType = asset.Value.GetClass();
+            Component assetScript = GetComponent(componentType);
+            if (assetScript is MonoBehaviour monoBehaviour)
+            {
+                monoBehaviour.enabled = false;
+            }
+        }
+    }
+
+    private void CreateAssetsDic()
+    {
+        foreach (Asset asset in assets)
+        {
+            assetsDic.Add(asset.asset, asset.script);
         }
     }
 }
