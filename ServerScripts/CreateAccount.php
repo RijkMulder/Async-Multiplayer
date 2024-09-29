@@ -50,5 +50,6 @@ $stmt->bindParam(":password_hash", $password);
 $stmt->execute();
 
 // account made succesfully
+$token = generateToken();
 include 'login.php';
 

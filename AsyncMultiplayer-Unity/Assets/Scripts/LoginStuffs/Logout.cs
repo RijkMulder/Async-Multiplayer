@@ -7,7 +7,6 @@ using UnityEngine.Networking;
 public class Logout : MonoBehaviour
 {
     private PackageManager packageManager;
-    private string url = "http://127.0.0.1/edsa-webdev/CheckLogin.php";
 
     private void Start()
     {
