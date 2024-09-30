@@ -35,7 +35,7 @@ if (!isset($request->action) || empty($request->action)) {
 // check action type
 switch ($request->action) {
     case "createAccount":
-        include 'CreateAccount.php';
+        include 'CreateAccount.php';  
         break;
     case "loginAccount":
         $token = generateToken();
@@ -48,6 +48,9 @@ switch ($request->action) {
         include 'Logout.php';
         break;
     case "resetPassword":
+        break;
+    case "getPlot":
+        include 'GetPlot.php';
         break;
     default:
     $response->status = "noValidAction";
