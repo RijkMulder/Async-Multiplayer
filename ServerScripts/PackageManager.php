@@ -1,7 +1,6 @@
 <?php
 $response = new stdClass();
 $request = json_decode($_POST['newEntry']);
-
 // check if incoming packet is valid
 if (!isset($_POST['newEntry'])) {
     $response->status = "invalidPostData";
@@ -51,6 +50,9 @@ switch ($request->action) {
         break;
     case "getPlot":
         include 'GetPlot.php';
+        break;
+    case "savePlot":
+        include 'SavePlot.php';
         break;
     default:
     $response->status = "noValidAction";

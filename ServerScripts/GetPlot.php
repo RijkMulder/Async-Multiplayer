@@ -15,4 +15,10 @@ if ($result == null) {
     $response->customMessage = "this user did not have plot yet, new one made.";
     die(json_encode($response));
 }
+else {
+    $response->plot = json_decode($result['plot_layout']);
+    $response->status = "gotPlot";
+    $response->customMessage = "got users plot from database";
+    die(json_encode($response));
+}
 

@@ -39,7 +39,6 @@ public class PackageManager : MonoBehaviour
                 // Check for valid response
                 if (webRequest.downloadHandler != null && !string.IsNullOrEmpty(webRequest.downloadHandler.text))
                 {
-                    Debug.Log($"Text response: {webRequest.downloadHandler.text}");
                     try
                     {
                         TResponse response = JsonUtility.FromJson<TResponse>(webRequest.downloadHandler.text);
