@@ -28,12 +28,13 @@ public class CreateAccountWindow : MonoBehaviour
         Button toLoginButton = root.Q<Button>("ToLogin");
         submitButton.RegisterCallback<ClickEvent>(evt =>
         {
-            StartCoroutine(packageManager.SendRequest(JsonUtility.ToJson(new CreateAccountRequest
+            CreateAccountRequest request = new CreateAccountRequest
             {
                 email = email.value,
                 username = username.value,
                 password = password.value
-            })));
+            };
+            StartCoroutine(CreateRequest(request));
         });
         toLoginButton.RegisterCallback<ClickEvent>(evt =>
         {
@@ -59,12 +60,29 @@ public class CreateAccountWindow : MonoBehaviour
         }
         return result;
     }
+
+    private IEnumerator CreateRequest(CreateAccountRequest request)
+    {
+        yield return StartCoroutine(packageManager.WebRequest<CreateAccountRequest, CreateAccountResponse>(request,
+            response =>
+            {
+                Debug.Log(response.token);
+            }));
+    }
 }
 [System.Serializable]
-public class CreateAccountRequest 
+public class CreateAccountRequest : AbstractRequest
 {
-    public string action = "createAccount";
     public string email;
     public string username;
     public string password;
+    public CreateAccountRequest()
+    {
+        action = "createAccount";
+    }
+}
+[System.Serializable]
+public class CreateAccountResponse : AbstractResponse
+{
+    public string token;
 }

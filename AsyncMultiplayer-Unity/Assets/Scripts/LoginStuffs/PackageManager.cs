@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+
 public class PackageManager : MonoBehaviour
 {
     public static PackageManager Instance { get; private set; }
@@ -13,95 +14,62 @@ public class PackageManager : MonoBehaviour
         Instance = this;
     }
 
-    private string[] errorMsgs = new string[]
+    public IEnumerator WebRequest<TRequest, TResponse>(TRequest request, Action<TResponse> onComplete)
+        where TRequest : AbstractRequest
+        where TResponse : AbstractResponse
     {
-        "invalidJson",
-        "dataBaseConnectionError",
-        "invalidAction",
-        "emailNotInDatabase",
-        "invalidPassword",
-        "invalidEmail",
-        "emailAlreadyExists",
-        "usernameAlreadyExists",
-        "usernameLength",
-        "wrongToken"
-    };
-    public IEnumerator SendRequest(string newRequest) 
-    {
-        // add to request form
-        List<IMultipartFormSection> form = new();
-        form.Add(new MultipartFormDataSection("newEntry", newRequest));
-        
-        // send request
+        string newEntry = JsonUtility.ToJson(request);
+        List<IMultipartFormSection> form = new List<IMultipartFormSection>();
+        form.Add(new MultipartFormDataSection("newEntry", newEntry));
         using (UnityWebRequest webRequest = UnityWebRequest.Post(url, form))
         {
-            // wait for request
+            // timeout time
             webRequest.timeout = 10;
             yield return webRequest.SendWebRequest();
-            
-            // check for errors
-            if (webRequest.result == UnityWebRequest.Result.ConnectionError || 
+
+            // Check for errors
+            if (webRequest.result == UnityWebRequest.Result.ConnectionError ||
                 webRequest.result == UnityWebRequest.Result.ProtocolError)
             {
-                Debug.LogError(webRequest.error);
+                Debug.LogError($"Request failed: {webRequest.error}");
+                onComplete?.Invoke(null);
             }
             else
             {
+                // Check for valid response
                 if (webRequest.downloadHandler != null && !string.IsNullOrEmpty(webRequest.downloadHandler.text))
                 {
+                    Debug.Log($"Text response: {webRequest.downloadHandler.text}");
                     try
                     {
-                        // get response and check it
-                        Response response = JsonUtility.FromJson<Response>(webRequest.downloadHandler.text);
-                        Debug.Log($" {response.status} - {response.customMessage} - {response.token}"); // dont forget to remove this line
-                        CheckResponse(response);
+                        TResponse response = JsonUtility.FromJson<TResponse>(webRequest.downloadHandler.text);
+                        Debug.Log($"Status: {response.status}, {response.customMessage}");
+                        onComplete?.Invoke(response);
                     }
                     catch (Exception ex)
                     {
                         Debug.LogError($"Failed to parse response: {ex.Message}");
+                        onComplete?.Invoke(null);
                     }
                 }
                 else
                 {
-                    Debug.LogError("Response is empty or null");    
+                    Debug.LogError("Received an empty or null response");
                 }
             }
-        }
-    }
-
-    private void CheckResponse(Response response)
-    {
-        // check for error logs
-        for (int i = 0; i < errorMsgs.Length; i++)
-        {
-            if (errorMsgs[i] == response.status)
-            {
-                Debug.LogError(response.customMessage);
-                return;
-            }
-        }
-        
-        // check for success logs
-        switch (response.status)
-        {
-            case "loginSuccesfull":
-                PlayerPrefs.SetString("token", response.token);
-                UIPanelManager.Instance.IsLoggedIn();
-                break;
-            case "loggedOut":
-                UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[0].asset);
-                break;
-            case "tokenFound":
-                UIPanelManager.Instance.IsLoggedIn();
-                break;
         }
     }
 }
 
 [System.Serializable]
-public class Response
+public abstract class AbstractRequest
+{
+    public string action;
+}
+
+[System.Serializable]
+public abstract class AbstractResponse
 {
     public string status;
     public string customMessage;
-    public string token;
 }

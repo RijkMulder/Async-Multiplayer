@@ -16,13 +16,37 @@ public class CheckLoginToken : MonoBehaviour
         if (token == string.Empty) return;
         
         // send request
-        string json = JsonUtility.ToJson(new CheckTokenRequest { token = token });
-        StartCoroutine(packageManager.SendRequest(json));
+        StartCoroutine(CheckTokenRequest());
+    }
+
+    private IEnumerator CheckTokenRequest()
+    {
+        CheckTokenRequest request = new CheckTokenRequest
+        {
+            token = PlayerPrefs.GetString("token")
+        };
+        yield return StartCoroutine(packageManager.WebRequest<CheckTokenRequest, CheckTokenResponse>(request,
+            response =>
+            {
+                if (response.status == "tokenFound")
+                {
+                    UIPanelManager.Instance.IsLoggedIn();
+                }
+            }));
     }
 }
 [System.Serializable]
-public class CheckTokenRequest
-{
-    public string action = "checkToken";
+public class CheckTokenRequest : AbstractRequest
+{ 
     public string token;
+    public CheckTokenRequest()
+    {
+        action = "checkToken";
+    }
+}
+
+[System.Serializable]
+public class CheckTokenResponse : AbstractResponse
+{
+    
 }

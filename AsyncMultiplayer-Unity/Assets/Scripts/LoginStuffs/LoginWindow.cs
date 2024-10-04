@@ -24,40 +24,43 @@ public class LoginWindow : MonoBehaviour
         TextField password = root.Q<TextField>("Password");
         Button submitButton = root.Q<Button>("Submit");
         Button newAccountButton = root.Q<Button>("MakeAccount");
-        Button forgotPasswordButton = root.Q<Button>("ForgotPassword");
         submitButton.RegisterCallback<ClickEvent>(evt =>
         {
-            StartCoroutine(packageManager.SendRequest(JsonUtility.ToJson(new LoginAccountRequest
+            StartCoroutine(LoginRequest(new LoginAccountRequest
             {
                 email = email.value,
                 password = password.value
-            })));
+            }));
         });
         newAccountButton.RegisterCallback<ClickEvent>(evt =>
         {
             UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[1].asset);
         });
-        // forgotPasswordButton.RegisterCallback<ClickEvent>(evt =>
-        // {
-        //     StartCoroutine(LoginAccount(JsonUtility.ToJson(new LoginAccountRequest
-        //     {
-        //         email = email.value,
-        //         password = password.value
-        //     })));
-        // });
+    }
+
+    private IEnumerator LoginRequest(LoginAccountRequest request)
+    {
+        yield return StartCoroutine(packageManager.WebRequest<LoginAccountRequest, LoginAccountResponse>(request,
+            response =>
+            {
+                PlayerPrefs.SetString("token", response.token);
+                UIPanelManager.Instance.IsLoggedIn();
+            }));
     }
 }
 
 [System.Serializable]
-public class LoginAccountRequest
+public class LoginAccountRequest : AbstractRequest
 {
-    public string action = "loginAccount";
     public string email;
     public string password;
+    public LoginAccountRequest()
+    {
+        action = "loginAccount";
+    }
 }
 [System.Serializable]
-public class ResetPasswordRequest
+public class LoginAccountResponse : AbstractResponse
 {
-    public string action = "resetPassword";
-    public string email;
-} 
+    public string token;
+}

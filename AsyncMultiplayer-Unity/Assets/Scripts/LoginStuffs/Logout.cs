@@ -20,14 +20,33 @@ public class Logout : MonoBehaviour
         if (token == string.Empty) return;
         
         // send request
-        string json = JsonUtility.ToJson(new LogoutRequest { token = token });
-        StartCoroutine(packageManager.SendRequest(json));
+        LogoutRequest request = new LogoutRequest
+        {
+            token = token
+        };
+        StartCoroutine(LogoutRequest(request));
+    }
+    private IEnumerator LogoutRequest(LogoutRequest request)
+    {
+        yield return StartCoroutine(packageManager.WebRequest<LogoutRequest, LogoutResponse>(request,
+            response =>
+            {
+                UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[0].asset);
+            }));
     }
 }
 
 [System.Serializable]
-public class LogoutRequest
+public class LogoutRequest : AbstractRequest
 {
-    public string action = "logout";
     public string token;
+    public LogoutRequest()
+    {
+        action = "logout";
+    }
+}
+[System.Serializable]
+public class LogoutResponse : AbstractResponse
+{
+    
 }
