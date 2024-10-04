@@ -17,9 +17,9 @@ if ($result == null) {
 
     // insert all tiles
     $plotobj = json_decode($plot);
-    foreach ($plotbj->tiles as $tile) {
+    foreach ($plotobj->tiles as $tile) {
         $stmt = $connectionResult->prepare("INSERT INTO user_tiles (user_id, tile_position, tile_coord, tile_occupent) VALUES (:user_id, :tile_position, :tile_coord, :tile_occupent)");
-        $stmt->execute([':user_id' => $userid, ':tile_position' => json_encode($tile->position), ':tile_coord' => json_encode($tile->coord), ':tile_occupent' => json_encode($tile->occupent)])
+        $stmt->execute([':user_id' => $userid, ':tile_position' => json_encode($tile->position), ':tile_coord' => json_encode($tile->coord), ':tile_occupent' => json_encode($tile->tileOccupent)]);
     }
 
     $response->status = "plotSaved";

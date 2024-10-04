@@ -36,7 +36,11 @@ public class PlotManager : MonoBehaviour
         yield return StartCoroutine(manager.WebRequest<PlotGetRequest, PlotResponse>(getRequest,
             response =>
             {
-                if (response.status == "gotPlot") return;
+                if (response.status == "gotPlot")
+                {
+                    ConstructPlot(response.plot);
+                    return;
+                }
                 int[] plotSize = Array.ConvertAll(response.plot.Split(','), int.Parse);
                 CreatePlot(plotSize);
             }));
@@ -81,6 +85,14 @@ public class PlotManager : MonoBehaviour
         TileData data = new();
         (data.coord, data.position) = (coord, position);
         return data;
+    }
+    private void ConstructPlot(string plot)
+    {
+        TileDataList data = JsonUtility.FromJson<TileDataList>(plot);
+        foreach (TileData tile in data.tiles)
+        {
+            GameObject newTile = Instantiate(plotTilePrefab, tile.position, Quaternion.identity);
+        }
     }
 }
 [System.Serializable]
