@@ -7,47 +7,36 @@ using UnityEngine;
 [System.Serializable]
 public struct TileData
 {
-    public Vector2Int coord;
-    public Vector3 position;
-    public GameObject tileOccupent;
+    public int posX;
+    public int posY;
+    public string tileType;
 }
 public class PlotManager : MonoBehaviour
 {
     private PackageManager manager;
+    [SerializeField] private int tileSize;
     [SerializeField] private GameObject plotTilePrefab;
     private void Start()
     {
         manager = PackageManager.Instance;
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
+        PlotGetRequest getRequest = new PlotGetRequest
         {
-            PlotGetRequest getRequest = new PlotGetRequest
-            {
-                token = PlayerPrefs.GetString("token")
-            };
-            StartCoroutine(PlotFindRequest(getRequest));
-        }
+            token = PlayerPrefs.GetString("token")
+        };
+        StartCoroutine(PlotFindRequest(getRequest));
     }
     private IEnumerator PlotFindRequest(PlotGetRequest getRequest)
     {
-        yield return StartCoroutine(manager.WebRequest<PlotGetRequest, PlotResponse>(getRequest,
+        yield return StartCoroutine(manager.WebRequest<PlotGetRequest, GetPlotResponse>(getRequest,
             response =>
             {
-                if (response.status == "gotPlot")
-                {
-                    ConstructPlot(response.plot);
-                    return;
-                }
                 int[] plotSize = Array.ConvertAll(response.plot.Split(','), int.Parse);
                 CreatePlot(plotSize);
             }));
     }
-    private IEnumerator PlotSaveRequest(PlotSaveRequest saveRequest)
+    private IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
     {
-        yield return StartCoroutine(manager.WebRequest<PlotSaveRequest, PlotResponse>(saveRequest,
+        yield return StartCoroutine(manager.WebRequest<TileSaveRequest, PlotResponse>(saveRequest,
             response =>
             {
                 Debug.Log(response.customMessage);
@@ -55,50 +44,21 @@ public class PlotManager : MonoBehaviour
     }
     private void CreatePlot(int[] plotSize)
     {
-        float tileSize = plotTilePrefab.transform.localScale.x;
-        List<TileData> tiles = new List<TileData>();
         for (int i = 0; i < plotSize[0]; i++)
         {
             for (int j = 0; j < plotSize[1]; j++)
             {
-                // set position and coord
-                Vector3 position = new Vector3(j * tileSize, 0, i * tileSize);
-                Vector2Int coord = new Vector2Int(i + 1, j + 1);
-                
-                // create tile and add to list
-                tiles.Add(InitTile(coord, position));
+                // set position
+                Vector2Int position = new Vector2Int(j * tileSize, i * tileSize);
+                Instantiate(plotTilePrefab, new Vector3(position.x, 0, position.y), Quaternion.identity);
             }
-        }
-        
-        // save plot
-        PlotSaveRequest saveRequest = new PlotSaveRequest
-        {
-            token = PlayerPrefs.GetString("token"),
-            plot = JsonUtility.ToJson(new TileDataList { tiles = tiles }, true)
-        };
-        StartCoroutine(PlotSaveRequest(saveRequest));
-    }
-
-    private TileData InitTile(Vector2Int coord, Vector3 position)
-    {
-        GameObject newTile = Instantiate(plotTilePrefab, position, Quaternion.identity);
-        TileData data = new();
-        (data.coord, data.position) = (coord, position);
-        return data;
-    }
-    private void ConstructPlot(string plot)
-    {
-        TileDataList data = JsonUtility.FromJson<TileDataList>(plot);
-        foreach (TileData tile in data.tiles)
-        {
-            GameObject newTile = Instantiate(plotTilePrefab, tile.position, Quaternion.identity);
         }
     }
 }
 [System.Serializable]
 public class TileDataList
 {
-    public List<TileData> tiles;
+    public TileData[] tiles;
 }
 [System.Serializable]
 public class PlotGetRequest : AbstractRequest
@@ -110,17 +70,23 @@ public class PlotGetRequest : AbstractRequest
     }
 }
 [System.Serializable]
-public class PlotSaveRequest : AbstractRequest
+public class TileSaveRequest : AbstractRequest
 {
     public string token;
-    public string plot;
-    public PlotSaveRequest()
+    public TileData tile;
+    public TileSaveRequest()
     {
         action = "savePlot";
     }
 }
 [System.Serializable]
 public class PlotResponse : AbstractResponse
+{
+    public TileData plot;
+}
+
+[System.Serializable]
+public class GetPlotResponse : AbstractResponse
 {
     public string plot;
 }

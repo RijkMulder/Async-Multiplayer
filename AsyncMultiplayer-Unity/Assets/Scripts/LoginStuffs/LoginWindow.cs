@@ -43,6 +43,7 @@ public class LoginWindow : MonoBehaviour
         yield return StartCoroutine(packageManager.WebRequest<LoginAccountRequest, LoginAccountResponse>(request,
             response =>
             {
+                if (response.status != "loginSuccesfull") return;
                 PlayerPrefs.SetString("token", response.token);
                 UIPanelManager.Instance.IsLoggedIn();
             }));

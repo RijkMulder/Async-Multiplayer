@@ -3,18 +3,14 @@
 $stmt = $connectionResult->prepare("SELECT * FROM users WHERE token = :token");
 $stmt->execute([':token' => $request->token]);
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-// give new plot
 $userid = $result['user_id'];
-$plot = $request->plot;
-$stmt = $connectionResult->prepare("SELECT * FROM user_plots WHERE user_id = :id");
-$stmt->execute([':id' => $userid]);
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
-if ($result == null) {
-    // insert new plot
-    $stmt = $connectionResult->prepare("INSERT INTO user_plots (user_id, plot_layout) VALUES (:user_id, :plot_layout)");
-    $stmt->execute([':user_id' => $userid, ':plot_layout' => json_encode($plot)]);
 
+// check if user has a plot
+$tile = $request->tile;
+$stmt = $connectionResult->prepare("SELECT * FROM user_tiles WHERE user_id = :id");
+$stmt->execute([':id' => $userid]);
+$result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+if ($result == null) {
     // insert all tiles
     $plotobj = json_decode($plot);
     foreach ($plotobj->tiles as $tile) {
