@@ -41,26 +41,39 @@ public class BuildingManager : MonoBehaviour
                 MeshRenderer tileMesh = hit.transform.GetComponent<MeshRenderer>();
                 Vector3 tilePos = tileMesh.bounds.center;
                 
-                // check if tile is already occupied
-                if (plotManager.CheckTile(new Vector2(tilePos.x, tilePos.z))) return;
-                
-                // create building and save to database
-                CreateBuilding(currentType.buildingName, tilePos);
-                TileData tileData = new TileData
-                {
-                    posX = tilePos.x,
-                    posY = tilePos.z,
-                    tileType = currentType.buildingName
-                };
-                StartCoroutine(plotManager.PlotSaveRequest(new TileSaveRequest
-                {
-                    token = PlayerPrefs.GetString("token"),
-                    tile = tileData
-                }));
+                // try to build
+                StartCoroutine(TryBuild(tilePos));
             }
         }
     }
 
+    private IEnumerator TryBuild(Vector3 pos)
+    {
+        // check if tile is already occupied
+        TileCheckRequest checkRequest = new TileCheckRequest
+        {
+            token = PlayerPrefs.GetString("token"),
+            tile = new TileData { posX = pos.x, posY = pos.z }
+        };
+
+        bool result = false;
+        yield return StartCoroutine(plotManager.TileCheckRequest(checkRequest, outcome => result = outcome));
+        Debug.Log(result);
+        // build building if not occupied
+        if (result) yield break;
+        CreateBuilding(currentType.buildingName, pos);
+        TileData tileData = new TileData
+        {
+            posX = pos.x,
+            posY = pos.z,
+            tileType = currentType.buildingName
+        };
+        StartCoroutine(plotManager.PlotSaveRequest(new TileSaveRequest
+        {
+            token = PlayerPrefs.GetString("token"),
+            tile = tileData
+        }));
+    }
     public void SetCurrentBuildingType(string buildingType)
     {
         currentType = Array.Find(buildingTypes, x => x.buildingName == buildingType);

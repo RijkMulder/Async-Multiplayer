@@ -68,6 +68,14 @@ function generateToken($length = 64) {
     return bin2hex(random_bytes($length / 2));
 }
 
+// get user
+function getUser($connectionResult, $request) {
+    $stmt = $connectionResult->prepare("SELECT * FROM users WHERE token = :token");
+    $stmt->execute([':token' => $request->token]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result['user_id'];
+}
+
 // get connection with database
 function getDatabaseConnection() {
     $dbHost = '127.0.0.1';

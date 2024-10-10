@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 [System.Serializable]
 public struct TileData
@@ -13,6 +14,7 @@ public class PlotManager : MonoBehaviour
 {
     public static PlotManager instance { get; private set; }
     private PackageManager manager;
+    private BuildingManager buildingManager;
     [SerializeField] private int tileSize;
     [SerializeField] private GameObject plotTilePrefab;
 
@@ -23,6 +25,7 @@ public class PlotManager : MonoBehaviour
     private void Start()
     {
         manager = PackageManager.Instance;
+        buildingManager = BuildingManager.instance;
         PlotGetRequest getRequest = new PlotGetRequest
         {
             token = PlayerPrefs.GetString("token")
@@ -34,8 +37,8 @@ public class PlotManager : MonoBehaviour
         yield return StartCoroutine(manager.WebRequest<PlotGetRequest, GetPlotResponse>(getRequest,
             response =>
             {
-                int[] plotSize = Array.ConvertAll(response.plot.Split(','), int.Parse);
-                CreatePlot(plotSize);
+                int[] plotSize = Array.ConvertAll(response.plotSize.Split(','), int.Parse);
+                CreatePlot(plotSize, response.tiles);
             }));
     }
     public IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
@@ -47,7 +50,7 @@ public class PlotManager : MonoBehaviour
             }));
     }
 
-    private IEnumerator TileCheckRequestCoroutine(TileCheckRequest checkRequest, Action<bool> onComplete)
+    public IEnumerator TileCheckRequest(TileCheckRequest checkRequest, Action<bool> onComplete)
     {
         yield return StartCoroutine(manager.WebRequest<TileCheckRequest, PlotResponse>(checkRequest,
             response =>
@@ -56,8 +59,9 @@ public class PlotManager : MonoBehaviour
                 onComplete(outcome);
             }));
     }
-    private void CreatePlot(int[] plotSize)
+    private void CreatePlot(int[] plotSize, TileData[] tiles)
     {
+        // create plot
         for (int i = 0; i < plotSize[0]; i++)
         {
             for (int j = 0; j < plotSize[1]; j++)
@@ -67,30 +71,13 @@ public class PlotManager : MonoBehaviour
                 Instantiate(plotTilePrefab, new Vector3(position.x, 0, position.y), Quaternion.identity);
             }
         }
-    }
-
-    /// <summary>
-    /// returns true when tile exists
-    /// </summary>
-    /// <param name="position"></param>
-    /// <returns></returns>
-    public bool CheckTile(Vector2 position)
-    {
-        TileCheckRequest checkRequest = new TileCheckRequest
+        // place buildings
+        foreach (TileData tile in tiles)
         {
-            token = PlayerPrefs.GetString("token"),
-            tile = new TileData { posX = position.x, posY = position.y }
-        };
-
-        bool result = false;
-        StartCoroutine(TileCheckRequestCoroutine(checkRequest, outcome => result = outcome));
-        return result;
+            Vector3 position = new Vector3(tile.posX, 0.5f,  tile.posY);
+            buildingManager.CreateBuilding(tile.tileType, position);
+        }
     }
-}
-[System.Serializable]
-public class TileDataList
-{
-    public TileData[] tiles;
 }
 [System.Serializable]
 public class PlotGetRequest : AbstractRequest
@@ -130,5 +117,6 @@ public class PlotResponse : AbstractResponse
 [System.Serializable]
 public class GetPlotResponse : AbstractResponse
 {
-    public string plot;
+    public string plotSize;
+    public TileData[] tiles;
 }
