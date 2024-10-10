@@ -54,6 +54,9 @@ switch ($request->action) {
     case "savePlot":
         include 'SavePlot.php';
         break;
+    case "checkTile":
+        include 'CheckTile.php';
+        break;
     default:
     $response->status = "noValidAction";
     $response->customMessage = "no valid action was given.";

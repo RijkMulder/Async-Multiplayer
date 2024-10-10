@@ -1,21 +1,25 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
 [System.Serializable]
 public struct TileData
 {
-    public int posX;
-    public int posY;
+    public float posX;
+    public float posY;
     public string tileType;
 }
 public class PlotManager : MonoBehaviour
 {
+    public static PlotManager instance { get; private set; }
     private PackageManager manager;
     [SerializeField] private int tileSize;
     [SerializeField] private GameObject plotTilePrefab;
+
+    private void Awake()
+    {
+        instance = this;
+    }
     private void Start()
     {
         manager = PackageManager.Instance;
@@ -23,9 +27,9 @@ public class PlotManager : MonoBehaviour
         {
             token = PlayerPrefs.GetString("token")
         };
-        StartCoroutine(PlotFindRequest(getRequest));
+        StartCoroutine(PlotConstructRequest(getRequest));
     }
-    private IEnumerator PlotFindRequest(PlotGetRequest getRequest)
+    private IEnumerator PlotConstructRequest(PlotGetRequest getRequest)
     {
         yield return StartCoroutine(manager.WebRequest<PlotGetRequest, GetPlotResponse>(getRequest,
             response =>
@@ -34,12 +38,22 @@ public class PlotManager : MonoBehaviour
                 CreatePlot(plotSize);
             }));
     }
-    private IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
+    public IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
     {
         yield return StartCoroutine(manager.WebRequest<TileSaveRequest, PlotResponse>(saveRequest,
             response =>
             {
                 Debug.Log(response.customMessage);
+            }));
+    }
+
+    private IEnumerator TileCheckRequestCoroutine(TileCheckRequest checkRequest, Action<bool> onComplete)
+    {
+        yield return StartCoroutine(manager.WebRequest<TileCheckRequest, PlotResponse>(checkRequest,
+            response =>
+            {
+                bool outcome = response.status == "tileExists";
+                onComplete(outcome);
             }));
     }
     private void CreatePlot(int[] plotSize)
@@ -53,6 +67,24 @@ public class PlotManager : MonoBehaviour
                 Instantiate(plotTilePrefab, new Vector3(position.x, 0, position.y), Quaternion.identity);
             }
         }
+    }
+
+    /// <summary>
+    /// returns true when tile exists
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    public bool CheckTile(Vector2 position)
+    {
+        TileCheckRequest checkRequest = new TileCheckRequest
+        {
+            token = PlayerPrefs.GetString("token"),
+            tile = new TileData { posX = position.x, posY = position.y }
+        };
+
+        bool result = false;
+        StartCoroutine(TileCheckRequestCoroutine(checkRequest, outcome => result = outcome));
+        return result;
     }
 }
 [System.Serializable]
@@ -80,9 +112,19 @@ public class TileSaveRequest : AbstractRequest
     }
 }
 [System.Serializable]
+public class TileCheckRequest : AbstractRequest
+{
+    public string token;
+    public TileData tile;
+    public TileCheckRequest()
+    {
+        action = "checkTile";
+    }
+}
+[System.Serializable]
 public class PlotResponse : AbstractResponse
 {
-    public TileData plot;
+    public TileData tile;
 }
 
 [System.Serializable]

@@ -123,6 +123,56 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &231723639
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 231723641}
+  - component: {fileID: 231723640}
+  m_Layer: 0
+  m_Name: BuildingManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &231723640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231723639}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb41c7ccec93cf34289ee4139180860d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buildingTypes:
+  - name: Test
+    prefab: {fileID: 4988480548650083170, guid: 31446dd43116b10419616a142459613f, type: 3}
+  currentType:
+    name: Test
+    prefab: {fileID: 4988480548650083170, guid: 31446dd43116b10419616a142459613f, type: 3}
+--- !u!4 &231723641
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231723639}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.696599, y: 0.038576223, z: 4.8811865}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &501705736
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,8 +352,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 538866937}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2403162, y: 0, z: 0, w: 0.9706947}
-  m_LocalPosition: {x: 4.96, y: 11.87, z: -4.04}
+  m_LocalRotation: {x: 0.5007098, y: 0, z: 0, w: 0.8656153}
+  m_LocalPosition: {x: 3.98, y: 7.2, z: -0.23}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -407,3 +457,4 @@ SceneRoots:
   - {fileID: 501705738}
   - {fileID: 1368180904}
   - {fileID: 614996361}
+  - {fileID: 231723641}
