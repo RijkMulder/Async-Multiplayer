@@ -10,7 +10,7 @@ public class CreateAccountWindow : MonoBehaviour
 {
     private PackageManager packageManager;
     private UIDocument uiDocument;
-    private string url = "http://127.0.0.1/edsa-webdev/CheckLogin.php";
+    private string url = "http://127.0.0.1/edsa-webdev/Account/AccountManager.php";
 
     private void Start()
     {
@@ -67,7 +67,7 @@ public class CreateAccountWindow : MonoBehaviour
             response =>
             {
                 Debug.Log(response.token);
-            }));
+            }, url));
     }
 }
 [System.Serializable]

@@ -10,11 +10,13 @@ $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // create new entry
 if ($result == false) {
-    $stmt = $connectionResult->prepare("INSERT INTO user_tiles (tile_pos_x, tile_pos_y, tile_type,  user_id) VALUES (:posX, :posY, :tiletype, :user_id)");
+    $stmt = $connectionResult->prepare("INSERT INTO user_tiles (tile_pos_x, tile_pos_y, tile_type, last_updated, user_id) VALUES (:posX, :posY, :tiletype, :last_updated, :user_id)");
+    $currentTime = date("Y-m-d H:i:s", time());
     $stmt->execute([
         ':posX' => $tile->posX,
         ':posY' => $tile->posY,
         ':tiletype' => $tile->tileType,
+        ':last_updated' => $currentTime,
         ':user_id' => $userid
     ]);
     $response->status = "tileInserted";

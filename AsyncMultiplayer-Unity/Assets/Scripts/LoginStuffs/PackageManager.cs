@@ -7,14 +7,13 @@ using UnityEngine.Networking;
 public class PackageManager : MonoBehaviour
 {
     public static PackageManager Instance { get; private set; }
-    private string url = "http://127.0.0.1/edsa-webdev/PackageManager.php";
 
     private void Awake()
     {
         Instance = this;
     }
 
-    public IEnumerator WebRequest<TRequest, TResponse>(TRequest request, Action<TResponse> onComplete)
+    public IEnumerator WebRequest<TRequest, TResponse>(TRequest request, Action<TResponse> onComplete, string url)
         where TRequest : AbstractRequest
         where TResponse : AbstractResponse
     {

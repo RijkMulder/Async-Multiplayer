@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public struct Asset
@@ -57,6 +58,7 @@ public class UIPanelManager : MonoBehaviour
                 monoBehaviour.enabled = false;
             }
         }
+        SceneManager.LoadScene("GameScene");
     }
 
     private void CreateAssetsDic()

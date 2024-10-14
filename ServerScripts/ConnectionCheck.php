@@ -31,43 +31,6 @@ if (!isset($request->action) || empty($request->action)) {
     die(json_encode($response));
 }
 
-// check action type
-switch ($request->action) {
-    case "createAccount":
-        include 'CreateAccount.php';  
-        break;
-    case "loginAccount":
-        $token = generateToken();
-        include 'Login.php';
-        break;
-    case "checkToken":
-        include 'CheckLoginToken.php';
-        break;
-    case "logout":
-        include 'Logout.php';
-        break;
-    case "resetPassword":
-        break;
-    case "getPlot":
-        include 'GetPlot.php';
-        break;
-    case "savePlot":
-        include 'SavePlot.php';
-        break;
-    case "checkTile":
-        include 'CheckTile.php';
-        break;
-    default:
-    $response->status = "noValidAction";
-    $response->customMessage = "no valid action was given.";
-    die (json_encode($response));
-}
-
-// generate login token
-function generateToken($length = 64) {
-    return bin2hex(random_bytes($length / 2));
-}
-
 // get user
 function getUser($connectionResult, $request) {
     $stmt = $connectionResult->prepare("SELECT * FROM users WHERE token = :token");

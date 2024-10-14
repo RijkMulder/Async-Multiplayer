@@ -10,9 +10,15 @@ public struct TileData
     public float posY;
     public string tileType;
 }
+[System.Serializable]
+public struct UserData
+{
+    public int gold;
+}
 public class PlotManager : MonoBehaviour
 {
     public static PlotManager instance { get; private set; }
+    private string url = "http://127.0.0.1/edsa-webdev/Plot/PlotManager.php";
     private PackageManager manager;
     private BuildingManager buildingManager;
     [SerializeField] private int tileSize;
@@ -39,7 +45,7 @@ public class PlotManager : MonoBehaviour
             {
                 int[] plotSize = Array.ConvertAll(response.plotSize.Split(','), int.Parse);
                 CreatePlot(plotSize, response.tiles);
-            }));
+            }, url));
     }
     public IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
     {
@@ -47,7 +53,7 @@ public class PlotManager : MonoBehaviour
             response =>
             {
                 Debug.Log(response.customMessage);
-            }));
+            }, url));
     }
 
     public IEnumerator TileCheckRequest(TileCheckRequest checkRequest, Action<bool> onComplete)
@@ -57,7 +63,7 @@ public class PlotManager : MonoBehaviour
             {
                 bool outcome = response.status == "tileExists";
                 onComplete(outcome);
-            }));
+            }, url));
     }
     private void CreatePlot(int[] plotSize, TileData[] tiles)
     {
@@ -119,4 +125,5 @@ public class GetPlotResponse : AbstractResponse
 {
     public string plotSize;
     public TileData[] tiles;
+    public UserData userData;
 }

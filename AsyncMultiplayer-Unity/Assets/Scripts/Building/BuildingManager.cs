@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 [System.Serializable]
 public struct BuildingType
 {
-    [FormerlySerializedAs("name")] public string buildingName;
+    public string buildingName;
     public GameObject prefab;
 }
 /// <summary>
@@ -31,11 +31,13 @@ public class BuildingManager : MonoBehaviour
 
     private void Update()
     {
+        if (currentType.buildingName == null) return;
         if (Input.GetMouseButtonDown(0))
         {
             if (currentType.buildingName == null) return;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            bool isOverUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
+            if (Physics.Raycast(ray, out RaycastHit hit) && !isOverUI)
             {
                 // get position of tile
                 MeshRenderer tileMesh = hit.transform.GetComponent<MeshRenderer>();
@@ -58,7 +60,7 @@ public class BuildingManager : MonoBehaviour
 
         bool result = false;
         yield return StartCoroutine(plotManager.TileCheckRequest(checkRequest, outcome => result = outcome));
-        Debug.Log(result);
+        
         // build building if not occupied
         if (result) yield break;
         CreateBuilding(currentType.buildingName, pos);
@@ -73,6 +75,9 @@ public class BuildingManager : MonoBehaviour
             token = PlayerPrefs.GetString("token"),
             tile = tileData
         }));
+        
+        // reset current building type
+        currentType = new();
     }
     public void SetCurrentBuildingType(string buildingType)
     {

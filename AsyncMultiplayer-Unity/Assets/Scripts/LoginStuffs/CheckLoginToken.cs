@@ -7,7 +7,7 @@ using UnityEngine.Networking;
 public class CheckLoginToken : MonoBehaviour
 {
     private PackageManager packageManager;
-
+    private string url = "http://127.0.0.1/edsa-webdev/Account/AccountManager.php";
     private void Start()
     {
         packageManager = PackageManager.Instance;
@@ -32,7 +32,7 @@ public class CheckLoginToken : MonoBehaviour
                 {
                     UIPanelManager.Instance.IsLoggedIn();
                 }
-            }));
+            }, url));
     }
 }
 [System.Serializable]

@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class Logout : MonoBehaviour
 {
     private PackageManager packageManager;
+    private string url = "http://127.0.0.1/edsa-webdev/Account/AccountManager.php";
 
     private void Start()
     {
@@ -31,8 +33,8 @@ public class Logout : MonoBehaviour
         yield return StartCoroutine(packageManager.WebRequest<LogoutRequest, LogoutResponse>(request,
             response =>
             {
-                UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[0].asset);
-            }));
+                SceneManager.LoadScene("LoginScene");
+            }, url));
     }
 }
 

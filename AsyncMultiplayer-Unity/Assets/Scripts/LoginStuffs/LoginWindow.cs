@@ -9,7 +9,7 @@ public class LoginWindow : MonoBehaviour
 {
     private PackageManager packageManager;
     private UIDocument uiDocument;
-    private string url = "http://127.0.0.1/edsa-webdev/CheckLogin.php";
+    private string url = "http://127.0.0.1/edsa-webdev/Account/AccountManager.php";
 
     private void Start()
     {
@@ -46,7 +46,7 @@ public class LoginWindow : MonoBehaviour
                 if (response.status != "loginSuccesfull") return;
                 PlayerPrefs.SetString("token", response.token);
                 UIPanelManager.Instance.IsLoggedIn();
-            }));
+            }, url));
     }
 }
 
