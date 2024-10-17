@@ -55,7 +55,7 @@ public class BuildingManager : MonoBehaviour
         TileCheckRequest checkRequest = new TileCheckRequest
         {
             token = PlayerPrefs.GetString("token"),
-            tile = new TileData { posX = pos.x, posY = pos.z }
+            tile = new TileData { posX = pos.x, posY = pos.z },
         };
 
         bool result = false;
@@ -63,7 +63,17 @@ public class BuildingManager : MonoBehaviour
         
         // build building if not occupied
         if (result) yield break;
-        CreateBuilding(currentType.buildingName, pos);
+        
+        // check if building type exists
+        BuildingType type = Array.Find(buildingTypes, x => x.buildingName == currentType.buildingName);
+        if (type.prefab == null)
+        {
+            Debug.LogError($"Building type {currentType.buildingName} not found");
+            yield break;
+        }
+        CreateBuilding(type, pos);
+        
+        // save building to database
         TileData tileData = new TileData
         {
             posX = pos.x,
@@ -83,15 +93,13 @@ public class BuildingManager : MonoBehaviour
     {
         currentType = Array.Find(buildingTypes, x => x.buildingName == buildingType);
     }
-    public void CreateBuilding(string buildingType, Vector3 position)
+    public void CreateBuilding(BuildingType type, Vector3 position, string tileType = "")
     {
-        // find building type
-        BuildingType type = Array.Find(buildingTypes, x => x.buildingName == buildingType);
-        if (type.prefab == null)
-        {
-            Debug.LogError($"Building type {buildingType} not found");
-            return;
-        }
-        Instantiate(type.prefab, position, Quaternion.identity);
+        // override building type if tileType is not empty
+        if (tileType != string.Empty) type = Array.Find(buildingTypes, x => x.buildingName == tileType);
+        
+        // create building on top of tile
+        Vector3 offset = new Vector3(0, type.prefab.transform.localScale.y / 2, 0);
+        Instantiate(type.prefab, position + offset, Quaternion.identity);
     }
 }

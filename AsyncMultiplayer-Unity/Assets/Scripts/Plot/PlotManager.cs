@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Events;
 
 [System.Serializable]
 public struct TileData
@@ -43,8 +44,12 @@ public class PlotManager : MonoBehaviour
         yield return StartCoroutine(manager.WebRequest<PlotGetRequest, GetPlotResponse>(getRequest,
             response =>
             {
+                // construct plot from size and user buildings
                 int[] plotSize = Array.ConvertAll(response.plotSize.Split(','), int.Parse);
                 CreatePlot(plotSize, response.tiles);
+                
+                // invoke user data
+                EventManager.OnMoneyUpdate(response.userData);
             }, url));
     }
     public IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
@@ -81,7 +86,7 @@ public class PlotManager : MonoBehaviour
         foreach (TileData tile in tiles)
         {
             Vector3 position = new Vector3(tile.posX, 0.5f,  tile.posY);
-            buildingManager.CreateBuilding(tile.tileType, position);
+            buildingManager.CreateBuilding(new(), position, tile.tileType);
         }
     }
 }
