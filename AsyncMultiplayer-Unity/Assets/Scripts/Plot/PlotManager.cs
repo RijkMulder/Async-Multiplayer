@@ -49,7 +49,7 @@ public class PlotManager : MonoBehaviour
                 CreatePlot(plotSize, response.tiles);
                 
                 // invoke user data
-                EventManager.OnMoneyUpdate(response.userData);
+                EventManager.OnUserDataUpdate(response.userData);
             }, url));
     }
     public IEnumerator PlotSaveRequest(TileSaveRequest saveRequest)
@@ -66,8 +66,12 @@ public class PlotManager : MonoBehaviour
         yield return StartCoroutine(manager.WebRequest<TileCheckRequest, PlotResponse>(checkRequest,
             response =>
             {
-                bool outcome = response.status == "tileExists";
+                // bool true if tile not free or not enough money
+                bool outcome = response.status != "tileFree";
                 onComplete(outcome);
+                
+                // invoke user data
+                if (!outcome) EventManager.OnUserDataUpdate(response.userData);
             }, url));
     }
     private void CreatePlot(int[] plotSize, TileData[] tiles)
@@ -123,6 +127,7 @@ public class TileCheckRequest : AbstractRequest
 public class PlotResponse : AbstractResponse
 {
     public TileData tile;
+    public UserData userData;
 }
 
 [System.Serializable]

@@ -22,9 +22,17 @@ $result = $stmt->fetch(PDO::FETCH_ASSOC);
 if ($result == false) {
     // check price
     if (CheckPrice($connectionResult, $userid, $tile) == true) {
+        // update gold
         UpdateGold($connectionResult, $userid, $tile);
-        $response->status = "doesntmatter";
-        $response->customMessage = "posx: $tile->posX, posy: $tile->posY";
+
+        // get user data
+        $userdata = new stdClass();
+        $userdata->gold = GetUserData($connectionResult, $userid)['gold'];
+
+        // send succes response
+        $response->userData = $userdata;
+        $response->status = "tileFree";
+        $response->customMessage = "succesfully placed building";
         die(json_encode($response));
     }
     else {
@@ -40,11 +48,11 @@ $response->customMessage = "This tile already has an occupent";
 die(json_encode($response));
 
 function CheckPrice($connectionResult, $userid, $tile) {
-    // get current gold ammount
+    // get current gold amount
     $gold = GetGoldAmnt($connectionResult, $userid);
 
     // get price
-    $pice = GetPriceAmnt($connectionResult, $tile);
+    $price = GetPriceAmnt($connectionResult, $tile);
     
     // check if enough gold
     return $gold >= $price ? true : false;
@@ -54,7 +62,7 @@ function UpdateGold($connectionResult, $userid, $tile) {
     // calculate new gold
     $newGold = GetGoldAmnt($connectionResult, $userid) - GetPriceAmnt($connectionResult, $tile);
     
-    // upaate gold
+    // update gold
     $stmt = $connectionResult->prepare("UPDATE user_data SET gold = :new_gold WHERE user_id = :user_id");
     $stmt->execute([':new_gold' => $newGold, ':user_id' => $userid]);
 }
@@ -66,9 +74,15 @@ function GetGoldAmnt($connectionResult, $userid) {
     return $g;
 }
 function GetPriceAmnt($connectionResult, $tile) {
-    $stmt = $connectionResult->prepare("SELECT * FROM building_prices WHERE building_name = :name");
-    $stmt->execute([':name' => $tile->tileType]);
+    $stmt = $connectionResult->prepare("SELECT * FROM building_prices WHERE building_name = :building_name");
+    $stmt->execute([':building_name' => $tile->tileType]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $p = $result['price'];
     return $p;
+}
+function GetUserData($connectionResult, $userid) {
+    $stmt = $connectionResult->prepare("SELECT * FROM user_data WHERE user_id = :user_id");
+    $stmt->execute([':user_id' => $userid]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $result;
 }

@@ -55,7 +55,7 @@ public class BuildingManager : MonoBehaviour
         TileCheckRequest checkRequest = new TileCheckRequest
         {
             token = PlayerPrefs.GetString("token"),
-            tile = new TileData { posX = pos.x, posY = pos.z },
+            tile = new TileData { posX = pos.x, posY = pos.z, tileType = currentType.buildingName },
         };
 
         bool result = false;

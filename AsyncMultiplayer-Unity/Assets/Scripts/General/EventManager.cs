@@ -5,7 +5,7 @@ namespace Events {
     {
         public static event UnityAction<UserData> MoneyUpdate;
         
-        public static void OnMoneyUpdate(UserData data) => MoneyUpdate?.Invoke(data);
+        public static void OnUserDataUpdate(UserData data) => MoneyUpdate?.Invoke(data);
     }
 }
 
