@@ -66,7 +66,9 @@ public class CreateAccountWindow : MonoBehaviour
         yield return StartCoroutine(packageManager.WebRequest<CreateAccountRequest, CreateAccountResponse>(request,
             response =>
             {
-                Debug.Log(response.token);
+                if (response.status != "loginSuccesfull") return;
+                PlayerPrefs.SetString("token", response.token);
+                UIPanelManager.Instance.IsLoggedIn();
             }, url));
     }
 }

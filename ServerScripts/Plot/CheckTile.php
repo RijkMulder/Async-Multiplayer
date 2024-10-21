@@ -16,10 +16,10 @@ $stmt->execute([
     ':posY' => $tile->posY,
     ':tolerance' => $tolerance
 ]);
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
+$tileResult = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // tile doesnt exist
-if ($result == false) {
+if ($tileResult == false) {
     // check price
     if (CheckPrice($connectionResult, $userid, $tile) == true) {
         // update gold
@@ -43,9 +43,7 @@ if ($result == false) {
 }
 
 // tile already exists
-$response->status = "tileExists";
-$response->customMessage = "This tile already has an occupent";
-die(json_encode($response));
+include 'GetGold.php';
 
 function CheckPrice($connectionResult, $userid, $tile) {
     // get current gold amount

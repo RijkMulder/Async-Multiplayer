@@ -15,6 +15,7 @@ public struct TileData
 public struct UserData
 {
     public int gold;
+    public int beet;
 }
 public class PlotManager : MonoBehaviour
 {
@@ -71,7 +72,7 @@ public class PlotManager : MonoBehaviour
                 onComplete(outcome);
                 
                 // invoke user data
-                if (!outcome) EventManager.OnUserDataUpdate(response.userData);
+                EventManager.OnUserDataUpdate(response.userData);
             }, url));
     }
     private void CreatePlot(int[] plotSize, TileData[] tiles)

@@ -31,11 +31,16 @@ $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // data doesnt exist, make new
 if ($result == false) {
+    $userData->gold = 50;
     $stmt = $connectionResult->prepare("INSERT INTO user_data (user_id) VALUES (:user_id)");
     $stmt->execute([':user_id' => $userid]);
 }
 else {
-    $userData->gold = $result['gold'];
-    $response->userData = $userData;
+    foreach ($result as $key => $value) {
+        if ($key != 'user_id') {
+            $userData->$key = $value;
+        }
+    }
 }
+$response->userData = $userData;
 die(json_encode($response));
