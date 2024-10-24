@@ -2,6 +2,7 @@
 // set constants
 define("INTERVAL", 10);
 define("QUANTITY", 2);
+define("MAX", 10);
 
 // convert last update to timestamp
 $lastUpdated = $tileResult['last_updated'];
@@ -17,11 +18,11 @@ $elapsedTime = $currentTime - $lastUpdateTime;
 $fullIntervals = floor($elapsedTime / INTERVAL);
 
 // calculate new timestamp
-$secondsToAdd = $fullIntervals / INTERVAL;
+$secondsToAdd = $fullIntervals * INTERVAL;
 $newTime = $lastUpdateTime + $secondsToAdd;
 
 // update user data
-$beetToAdd = $fullIntervals * QUANTITY;
+$beetToAdd = max(0, min(MAX, $fullIntervals * QUANTITY));
 $newLastUpdated = date("Y-m-d H:i:s", $newTime);
 
 // add beet in db
@@ -33,7 +34,13 @@ $stmt = $connectionResult->prepare("SELECT * FROM user_data WHERE user_id = :use
 $stmt->execute([':user_id' => $userid]);
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 $userData = new stdClass;
-$response->userData = MakeUserData($result, $userData);
+if ($result === false) {
+    // Handle case where no user data is found
+    $response->status = "noUserFound";
+} else {
+    $userData = new stdClass;
+    $response->userData = MakeUserData($result, $userData);
+}
 $response->status = "beetAdded";
 $response->customMessage = "$userid";
 
