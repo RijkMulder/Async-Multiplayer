@@ -42,8 +42,10 @@ if ($tileResult == false) {
     }
 }
 
-// tile already exists
-include 'GetGold.php';
+else {
+    // tile already exists
+    include 'GetGold.php';
+}
 
 function CheckPrice($connectionResult, $userid, $tile) {
     // get current gold amount
