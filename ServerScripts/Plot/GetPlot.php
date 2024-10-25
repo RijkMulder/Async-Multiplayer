@@ -19,6 +19,7 @@ for ($i = 0; $i < count($tiles); $i++) {
     $tileData->posX = $tiles[$i]['tile_pos_x'];
     $tileData->posY = $tiles[$i]['tile_pos_y'];
     $tileData->tileType = $tiles[$i]['tile_type'];
+    $tileData->lastUpdate = $tiles[$i]['last_updated'];
     $responseTiles[$i] = $tileData;
 }
 $response->tiles = $responseTiles;

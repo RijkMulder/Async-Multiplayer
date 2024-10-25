@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Events;
 
 [System.Serializable]
@@ -10,6 +9,7 @@ public struct TileData
     public float posX;
     public float posY;
     public string tileType;
+    public string lastUpdate;
 }
 [System.Serializable]
 public struct UserData
@@ -91,7 +91,7 @@ public class PlotManager : MonoBehaviour
         foreach (TileData tile in tiles)
         {
             Vector3 position = new Vector3(tile.posX, 0.5f,  tile.posY);
-            buildingManager.CreateBuilding(new(), position, tile.tileType);
+            buildingManager.CreateBuilding(new(), position, tile.tileType, tile.lastUpdate);
         }
     }
 }

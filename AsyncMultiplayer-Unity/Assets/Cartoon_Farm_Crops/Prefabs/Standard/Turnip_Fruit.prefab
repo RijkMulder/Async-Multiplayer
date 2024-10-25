@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 33000011208878360}
   - component: {fileID: 23000013679225328}
   - component: {fileID: 64000012372487460}
+  - component: {fileID: 3741226719251107392}
   m_Layer: 0
   m_Name: Turnip_Fruit
   m_TagString: Untagged
@@ -106,3 +107,18 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300018, guid: b69b26c8b73b8bd49bf243bbe541a2e0, type: 3}
+--- !u!114 &3741226719251107392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000013984154124}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 340d668b4a5f74741983cc898de963d3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  growIntervalTime: 0
+  growAmntPerInterval: 0
+  maxCropAmnt: 0

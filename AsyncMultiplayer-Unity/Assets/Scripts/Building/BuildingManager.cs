@@ -1,10 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-[System.Serializable]
+[Serializable]
 public struct BuildingType
 {
     public string buildingName;
@@ -31,10 +29,8 @@ public class BuildingManager : MonoBehaviour
 
     private void Update()
     {
-        if (currentType.buildingName == null) return;
         if (Input.GetMouseButtonDown(0))
         {
-            if (currentType.buildingName == null) return;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             bool isOverUI = UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject();
             if (Physics.Raycast(ray, out RaycastHit hit) && !isOverUI)
@@ -93,13 +89,21 @@ public class BuildingManager : MonoBehaviour
     {
         currentType = Array.Find(buildingTypes, x => x.buildingName == buildingType);
     }
-    public void CreateBuilding(BuildingType type, Vector3 position, string tileType = "")
+    public void CreateBuilding(BuildingType type, Vector3 position, string tileType = "", string lastUpdate = "")
     {
         // override building type if tileType is not empty
         if (tileType != string.Empty) type = Array.Find(buildingTypes, x => x.buildingName == tileType);
-        
+        if (type.prefab == null)
+        {
+            Debug.LogError($"Building type {type.buildingName} not found");
+            return;
+        }
         // create building on top of tile
         Vector3 offset = new Vector3(0, type.prefab.transform.localScale.y / 2, 0);
-        Instantiate(type.prefab, position + offset, Quaternion.identity);
+        GameObject newBuilding = Instantiate(type.prefab, position + offset, Quaternion.identity);
+        if (lastUpdate != null && newBuilding.TryGetComponent(out IBuildingData buildingData))
+        {
+            buildingData.GetInterval(lastUpdate);
+        }
     }
 }

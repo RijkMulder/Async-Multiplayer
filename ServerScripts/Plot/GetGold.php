@@ -26,8 +26,12 @@ $beetToAdd = max(0, min(MAX, $fullIntervals * QUANTITY));
 $newLastUpdated = date("Y-m-d H:i:s", $newTime);
 
 // add beet in db
-$stmt = $connectionResult->prepare("UPDATE user_data SET Beet = Beet + :beet WHERE user_id = :userid");
+$stmt = $connectionResult->prepare("UPDATE user_data SET beet = beet + :beet WHERE user_id = :userid");
 $stmt->execute([':beet' => $beetToAdd, ':userid' => $userid]);
+
+// upate time
+$stmt = $connectionResult->prepare("UPDATE user_tiles SET last_updated = :new_last WHERE tile_id = :tile_id");
+$stmt->execute([':new_last' => $newLastUpdated, ':tile_id' => $tileResult['tile_id']]);
 
 // response
 $stmt = $connectionResult->prepare("SELECT * FROM user_data WHERE user_id = :user_id");
@@ -35,14 +39,12 @@ $stmt->execute([':user_id' => $userid]);
 $result = $stmt->fetch(PDO::FETCH_ASSOC);
 $userData = new stdClass;
 if ($result === false) {
-    // Handle case where no user data is found
     $response->status = "noUserFound";
 } else {
-    $userData = new stdClass;
+    $response->status = "beetAdded";
+    $response->customMessage = "$beetToAdd beet added";
     $response->userData = MakeUserData($result, $userData);
 }
-$response->status = "beetAdded";
-$response->customMessage = "$userid";
 
 function MakeUserData($result, $userData) {
     foreach ($result as $key => $value) {
@@ -50,5 +52,6 @@ function MakeUserData($result, $userData) {
             $userData->$key = $value;
         }
     }
+    return $userData;
 }
 die(json_encode($response));

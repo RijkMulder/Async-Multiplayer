@@ -27,7 +27,7 @@ if ($tileResult == false) {
 
         // get user data
         $userdata = new stdClass();
-        $userdata->gold = GetUserData($connectionResult, $userid)['gold'];
+        $userdata = GetUserData($connectionResult, $userid);
 
         // send succes response
         $response->userData = $userdata;
@@ -81,8 +81,17 @@ function GetPriceAmnt($connectionResult, $tile) {
     return $p;
 }
 function GetUserData($connectionResult, $userid) {
+    // get userdata from db
     $stmt = $connectionResult->prepare("SELECT * FROM user_data WHERE user_id = :user_id");
     $stmt->execute([':user_id' => $userid]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result;
+
+    // make userdata into class
+    $userData = new stdClass();
+    foreach ($result as $key => $value) {
+        if ($key != 'user_id') {
+            $userData->$key = $value;
+        }
+    }
+    return $userData;
 }
