@@ -44,6 +44,7 @@ if ($result === false) {
     $response->status = "beetAdded";
     $response->customMessage = "$beetToAdd beet added";
     $response->userData = MakeUserData($result, $userData);
+    $response->tile = MakeTile($tileResult);
 }
 
 function MakeUserData($result, $userData) {
@@ -53,5 +54,11 @@ function MakeUserData($result, $userData) {
         }
     }
     return $userData;
+}
+function MakeTile($tileResult) {
+    $tile = new stdClass;
+    $tile->posX = $tileResult['tile_pos_x'];
+    $tile->posY = $tileResult['tile_pos_y'];
+    return $tile;
 }
 die(json_encode($response));

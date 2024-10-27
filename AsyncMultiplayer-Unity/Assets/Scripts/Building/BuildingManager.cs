@@ -58,7 +58,11 @@ public class BuildingManager : MonoBehaviour
         yield return StartCoroutine(plotManager.TileCheckRequest(checkRequest, outcome => result = outcome));
         
         // build building if not occupied
-        if (result) yield break;
+        if (result)
+        {
+            currentType = new();
+            yield break;
+        }
         
         // check if building type exists
         BuildingType type = Array.Find(buildingTypes, x => x.buildingName == currentType.buildingName);
@@ -101,7 +105,7 @@ public class BuildingManager : MonoBehaviour
         // create building on top of tile
         Vector3 offset = new Vector3(0, type.prefab.transform.localScale.y / 2, 0);
         GameObject newBuilding = Instantiate(type.prefab, position + offset, Quaternion.identity);
-        if (lastUpdate != null && newBuilding.TryGetComponent(out IBuildingData buildingData))
+        if (lastUpdate != string.Empty && newBuilding.TryGetComponent(out IBuildingData buildingData))
         {
             buildingData.GetInterval(lastUpdate);
         }

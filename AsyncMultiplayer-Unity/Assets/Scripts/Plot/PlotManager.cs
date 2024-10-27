@@ -71,8 +71,9 @@ public class PlotManager : MonoBehaviour
                 bool outcome = response.status != "tileFree";
                 onComplete(outcome);
                 
-                // invoke user data
+                // invoke user data and crop update
                 EventManager.OnUserDataUpdate(response.userData);
+                EventManager.OnCropUpdate(response.tile);
             }, url));
     }
     private void CreatePlot(int[] plotSize, TileData[] tiles)
