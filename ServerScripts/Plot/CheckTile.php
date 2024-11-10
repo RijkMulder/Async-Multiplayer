@@ -1,6 +1,6 @@
 <?php
 // get user
-$userid = getUser($connectionResult, $request);
+$userid = getUser($connectionResult, $request, "user_id");
 
 // try find tile in db
 $tile = $request->tile;
@@ -20,17 +20,20 @@ $tileResult = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // tile doesnt exist
 if ($tileResult == false) {
+    // check if request info is empty
+    if ($request->tile->tileType == null) {
+        $response->status = "emptyTileData";
+        $response->customMessage = "tile data sent was empty.";
+        $response->userData = GetUserData($connectionResult, $userid);
+        die(json_encode($response));
+    }
     // check price
     if (CheckPrice($connectionResult, $userid, $tile) == true) {
         // update gold
         UpdateGold($connectionResult, $userid, $tile);
 
-        // get user data
-        $userdata = new stdClass();
-        $userdata = GetUserData($connectionResult, $userid);
-
         // send succes response
-        $response->userData = $userdata;
+        $response->userData = GetUserData($connectionResult, $userid);
         $response->status = "tileFree";
         $response->customMessage = "succesfully placed building";
         die(json_encode($response));
@@ -74,24 +77,9 @@ function GetGoldAmnt($connectionResult, $userid) {
     return $g;
 }
 function GetPriceAmnt($connectionResult, $tile) {
-    $stmt = $connectionResult->prepare("SELECT * FROM building_prices WHERE building_name = :building_name");
+    $stmt = $connectionResult->prepare("SELECT * FROM prices WHERE building_name = :building_name");
     $stmt->execute([':building_name' => $tile->tileType]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $p = $result['price'];
     return $p;
-}
-function GetUserData($connectionResult, $userid) {
-    // get userdata from db
-    $stmt = $connectionResult->prepare("SELECT * FROM user_data WHERE user_id = :user_id");
-    $stmt->execute([':user_id' => $userid]);
-    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // make userdata into class
-    $userData = new stdClass();
-    foreach ($result as $key => $value) {
-        if ($key != 'user_id') {
-            $userData->$key = $value;
-        }
-    }
-    return $userData;
 }

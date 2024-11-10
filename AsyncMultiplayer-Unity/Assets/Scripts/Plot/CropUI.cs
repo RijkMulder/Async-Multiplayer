@@ -5,6 +5,7 @@ using Events;
 public class CropUI : MonoBehaviour, IBuildingData
 {
     [SerializeField]private TMP_Text cropIndicator;
+    [SerializeField] private TMP_Text secondsLeft;
     private string lastUpdateTime;
     private int currentCropAmnt;
     
@@ -26,11 +27,13 @@ public class CropUI : MonoBehaviour, IBuildingData
     {
         GetInterval(lastUpdateTime);
     }
-    public void SetCurrentAmount(int currentAmount)
+    public void SetCurrentAmount(int currentAmount, int duration)
     {
         currentAmount = Mathf.Clamp(currentAmount + currentCropAmnt, 0, maxCropAmnt);
         currentCropAmnt = currentAmount;
         cropIndicator.text = $"{currentAmount}/{maxCropAmnt}";
+        if (currentAmount < maxCropAmnt) secondsLeft.text = duration.ToString();
+        else secondsLeft.text = "";
     }
     public void GetInterval<t>(t lastUpdate)
     {
@@ -41,7 +44,7 @@ public class CropUI : MonoBehaviour, IBuildingData
         
         // get number of intervals passed
         int intervalsPassed = (int)timePassed.TotalSeconds / growIntervalTime;
-        int secondsRemaining = (int)timePassed.TotalSeconds % growIntervalTime;
+        int secondsRemaining = growIntervalTime - (int)timePassed.TotalSeconds % growIntervalTime;
         int secondsPassed = intervalsPassed * growIntervalTime;
         
         // set new time
@@ -49,7 +52,7 @@ public class CropUI : MonoBehaviour, IBuildingData
         lastUpdateTime = newTime.ToString("yyyy-MM-dd HH:mm:ss");
         
         // update crop amount
-        if (intervalsPassed > 0)SetCurrentAmount(intervalsPassed * growAmntPerInterval);
+        SetCurrentAmount(intervalsPassed * growAmntPerInterval, secondsRemaining);
     }
     private void UpdateCrop(TileData data)
     {
@@ -58,7 +61,7 @@ public class CropUI : MonoBehaviour, IBuildingData
         if (transform.position.x == positionToCheck.x && transform.position.z == positionToCheck.y) 
         {
             currentCropAmnt = 0;
-            SetCurrentAmount(0);
+            SetCurrentAmount(0, growIntervalTime);
         }
     }
 }

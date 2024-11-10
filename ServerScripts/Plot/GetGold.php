@@ -1,7 +1,7 @@
 <?php
 // set constants
-define("INTERVAL", 10);
-define("QUANTITY", 2);
+define("INTERVAL", 30);
+define("QUANTITY", 1);
 define("MAX", 10);
 
 // convert last update to timestamp
@@ -34,27 +34,11 @@ $stmt = $connectionResult->prepare("UPDATE user_tiles SET last_updated = :new_la
 $stmt->execute([':new_last' => $newLastUpdated, ':tile_id' => $tileResult['tile_id']]);
 
 // response
-$stmt = $connectionResult->prepare("SELECT * FROM user_data WHERE user_id = :user_id");
-$stmt->execute([':user_id' => $userid]);
-$result = $stmt->fetch(PDO::FETCH_ASSOC);
-$userData = new stdClass;
-if ($result === false) {
-    $response->status = "noUserFound";
-} else {
-    $response->status = "beetAdded";
-    $response->customMessage = "$beetToAdd beet added";
-    $response->userData = MakeUserData($result, $userData);
-    $response->tile = MakeTile($tileResult);
-}
+$response->status = "beetAdded";
+$response->customMessage = "$beetToAdd beet added";
+$response->userData = GetUserData($connectionResult, $userid);
+$response->tile = MakeTile($tileResult);
 
-function MakeUserData($result, $userData) {
-    foreach ($result as $key => $value) {
-        if ($key != 'user_id') {
-            $userData->$key = $value;
-        }
-    }
-    return $userData;
-}
 function MakeTile($tileResult) {
     $tile = new stdClass;
     $tile->posX = $tileResult['tile_pos_x'];

@@ -24,6 +24,7 @@ public class LoginWindow : MonoBehaviour
         TextField password = root.Q<TextField>("Password");
         Button submitButton = root.Q<Button>("Submit");
         Button newAccountButton = root.Q<Button>("MakeAccount");
+        Button resetPasswordButton = root.Q<Button>("ForgotPassword");
         submitButton.RegisterCallback<ClickEvent>(evt =>
         {
             StartCoroutine(LoginRequest(new LoginAccountRequest
@@ -36,6 +37,13 @@ public class LoginWindow : MonoBehaviour
         {
             UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[1].asset);
         });
+        resetPasswordButton.RegisterCallback<ClickEvent>(evt =>
+        {
+            StartCoroutine(ResetPasswordRequest(new ResetPasswordRequest()
+            {
+                email = email.value
+            }));
+        });
     }
 
     private IEnumerator LoginRequest(LoginAccountRequest request)
@@ -46,6 +54,15 @@ public class LoginWindow : MonoBehaviour
                 if (response.status != "loginSuccesfull") return;
                 PlayerPrefs.SetString("token", response.token);
                 UIPanelManager.Instance.IsLoggedIn();
+            }, url));
+    }
+    private IEnumerator ResetPasswordRequest(ResetPasswordRequest request)
+    {
+        yield return StartCoroutine(packageManager.WebRequest<ResetPasswordRequest, ResetPasswordResponse>(request,
+            response =>
+            {
+                if (response.status != "resetPassword") return;
+                UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[2].asset);
             }, url));
     }
 }
@@ -60,8 +77,21 @@ public class LoginAccountRequest : AbstractRequest
         action = "loginAccount";
     }
 }
+[Serializable]
+public class ResetPasswordRequest : AbstractRequest
+{
+    public string email;
+    public ResetPasswordRequest()
+    {
+        action = "resetPassword";
+    }
+}
 [System.Serializable]
 public class LoginAccountResponse : AbstractResponse
 {
     public string token;
+}
+[Serializable]
+public class ResetPasswordResponse : AbstractResponse
+{
 }

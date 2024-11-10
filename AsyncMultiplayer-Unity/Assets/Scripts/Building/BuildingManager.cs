@@ -71,7 +71,7 @@ public class BuildingManager : MonoBehaviour
             Debug.LogError($"Building type {currentType.buildingName} not found");
             yield break;
         }
-        CreateBuilding(type, pos);
+        CreateBuilding(type, pos, lastUpdate: DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
         
         // save building to database
         TileData tileData = new TileData
@@ -109,5 +109,14 @@ public class BuildingManager : MonoBehaviour
         {
             buildingData.GetInterval(lastUpdate);
         }
+    }
+    public void SellItem(string buildingType)
+    {
+        SellRequest sellRequest = new SellRequest
+        {
+            token = PlayerPrefs.GetString("token"),
+            type = buildingType
+        };
+        StartCoroutine(plotManager.SellRequest(sellRequest));
     }
 }

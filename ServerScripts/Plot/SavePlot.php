@@ -1,6 +1,6 @@
 <?php
 // get user
-$userid = getUser($connectionResult, $request);
+$userid = getUser($connectionResult, $request, "user_id");
 
 // try find tile in db
 $tile = $request->tile;

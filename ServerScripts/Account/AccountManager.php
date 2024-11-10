@@ -17,6 +17,9 @@ switch ($request->action) {
     case "logout":
         include 'Logout.php';
         break;
+    case "resetPassword":
+        include 'ResetPassword.php';
+        break;
     default:
     $response->status = "noValidAction";
     $response->customMessage = "no valid action was given.";

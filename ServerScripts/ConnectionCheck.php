@@ -31,12 +31,25 @@ if (!isset($request->action) || empty($request->action)) {
     die(json_encode($response));
 }
 
-// get user
-function getUser($connectionResult, $request) {
+// get user info
+function getUser($connectionResult, $request, $type) {
     $stmt = $connectionResult->prepare("SELECT * FROM users WHERE token = :token");
     $stmt->execute([':token' => $request->token]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    return $result['user_id'];
+    switch ($type) {
+        case 'user_id':
+            return $result['user_id'];
+            break;
+        case 'user_email':
+            return $result['email'];
+            break;
+        case 'username':
+            return $result['username'];
+            break;
+        default:
+        return null;
+        break;
+    }
 }
 
 // get connection with database

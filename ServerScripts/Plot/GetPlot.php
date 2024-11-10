@@ -1,6 +1,6 @@
 <?php
 // get user
-$userid = getUser($connectionResult, $request);
+$userid = getUser($connectionResult, $request, "user_id");
 
 // get all tiles fomr user
 $stmt = $connectionResult->prepare("SELECT * FROM user_tiles WHERE user_id = :user_id");

@@ -59,6 +59,18 @@ public class PlotManager : MonoBehaviour
             response =>
             {
                 Debug.Log(response.customMessage);
+                EventManager.OnCropUpdate(response.tile);
+            }, url));
+    }
+    public IEnumerator SellRequest(SellRequest sellRequest)
+    {
+        yield return StartCoroutine(manager.WebRequest<SellRequest, PlotResponse>(sellRequest,
+            response =>
+            {
+                Debug.Log(response.customMessage);
+                
+                // invoke user data
+                EventManager.OnUserDataUpdate(response.userData);
             }, url));
     }
 
@@ -96,7 +108,7 @@ public class PlotManager : MonoBehaviour
         }
     }
 }
-[System.Serializable]
+[Serializable]
 public class PlotGetRequest : AbstractRequest
 {
     public string token;
@@ -105,7 +117,17 @@ public class PlotGetRequest : AbstractRequest
         action = "getPlot";
     }
 }
-[System.Serializable]
+[Serializable]
+public class SellRequest : AbstractRequest
+{
+    public string token;
+    public string type;
+    public SellRequest()
+    {
+        action = "sell";
+    }
+}
+[Serializable]
 public class TileSaveRequest : AbstractRequest
 {
     public string token;
@@ -115,7 +137,7 @@ public class TileSaveRequest : AbstractRequest
         action = "savePlot";
     }
 }
-[System.Serializable]
+[Serializable]
 public class TileCheckRequest : AbstractRequest
 {
     public string token;
@@ -125,14 +147,14 @@ public class TileCheckRequest : AbstractRequest
         action = "checkTile";
     }
 }
-[System.Serializable]
+[Serializable]
 public class PlotResponse : AbstractResponse
 {
     public TileData tile;
     public UserData userData;
 }
 
-[System.Serializable]
+[Serializable]
 public class GetPlotResponse : AbstractResponse
 {
     public string plotSize;
