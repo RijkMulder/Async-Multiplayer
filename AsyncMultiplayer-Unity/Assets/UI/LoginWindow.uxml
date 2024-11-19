@@ -4,6 +4,5 @@
         <ui:TextField picking-mode="Ignore" label="Password" name="Password" password="true" value="password" focusable="true" style="background-color: rgba(255, 255, 255, 0); width: 50%; height: 8%; font-size: 14px; color: rgb(27, 27, 27);" />
         <ui:Button text="Submit" parse-escape-sequences="true" display-tooltip-when-elided="true" name="Submit" style="width: 96px; height: 5%;" />
         <ui:Button text="Create new account" parse-escape-sequences="true" display-tooltip-when-elided="true" name="MakeAccount" style="width: 144px; height: 5%; -unity-text-align: middle-center;" />
-        <ui:Button text="Forgot password?" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ForgotPassword" style="width: 144px; height: 5%; -unity-text-align: middle-center;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -24,7 +24,6 @@ public class LoginWindow : MonoBehaviour
         TextField password = root.Q<TextField>("Password");
         Button submitButton = root.Q<Button>("Submit");
         Button newAccountButton = root.Q<Button>("MakeAccount");
-        Button resetPasswordButton = root.Q<Button>("ForgotPassword");
         submitButton.RegisterCallback<ClickEvent>(evt =>
         {
             StartCoroutine(LoginRequest(new LoginAccountRequest
@@ -36,13 +35,6 @@ public class LoginWindow : MonoBehaviour
         newAccountButton.RegisterCallback<ClickEvent>(evt =>
         {
             UIPanelManager.Instance.ChangeSourceAsset(UIPanelManager.Instance.assets[1].asset);
-        });
-        resetPasswordButton.RegisterCallback<ClickEvent>(evt =>
-        {
-            StartCoroutine(ResetPasswordRequest(new ResetPasswordRequest()
-            {
-                email = email.value
-            }));
         });
     }
 
